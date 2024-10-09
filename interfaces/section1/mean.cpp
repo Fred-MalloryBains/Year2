@@ -6,6 +6,11 @@ using namespace std;
 
 void read_data(istream &input, vector<float> &data)
 {
+    float value;
+    while (input >> value)
+    {
+        data.push_back(value);
+    }
 }
 
 int main(int argc, char *argv[])
@@ -22,6 +27,6 @@ int main(int argc, char *argv[])
         return 2;
     }
     vector<float> data;
-
+    read_data(infile, data);
     return 0;
 }
