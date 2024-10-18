@@ -1,0 +1,17 @@
+body {
+    background-color: lightblue; 
+}
+
+.container {
+    background-color: white; /* White background for the container */
+    padding: 20px;
+    border-radius: 10px;
+    margin-top: 50px;
+}
+
+.form {
+    background-color: pink; /* White background for the container */
+    padding: 20px;
+    border-radius: 10px;
+    margin-top: 50px;
+}

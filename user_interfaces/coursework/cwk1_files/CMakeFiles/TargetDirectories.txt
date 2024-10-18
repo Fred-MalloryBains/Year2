@@ -1,0 +1,5 @@
+/Users/fred/Documents/GitHub/Year2/user_interfaces/coursework/cwk1_files/CMakeFiles/quaketool.dir
+/Users/fred/Documents/GitHub/Year2/user_interfaces/coursework/cwk1_files/CMakeFiles/test_dataset.dir
+/Users/fred/Documents/GitHub/Year2/user_interfaces/coursework/cwk1_files/CMakeFiles/test_quake.dir
+/Users/fred/Documents/GitHub/Year2/user_interfaces/coursework/cwk1_files/CMakeFiles/edit_cache.dir
+/Users/fred/Documents/GitHub/Year2/user_interfaces/coursework/cwk1_files/CMakeFiles/rebuild_cache.dir

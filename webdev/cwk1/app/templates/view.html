@@ -1,0 +1,65 @@
+{% extends "base.html" %} {% block content %}
+<div class="container">
+  <h1>Assessments</h1>
+  <form action="{{ url_for('view') }}" method="GET">
+    <div class="form-group">
+      <label>
+        <input type="checkbox" name="show_completed" value="true" {% if
+        request.args.get('show_completed') == 'true' %} checked {% endif %}>
+        completed assessments
+      </label>
+    </div>
+    <button type="submit" class="btn btn-primary">Apply Filter</button>
+  </form>
+  <table class="table table-striped">
+    <thead>
+      <tr>
+        <th>Title</th>
+        <th>Module Code</th>
+        <th>Deadline Date</th>
+        <th>Description</th>
+        <th>Status</th>
+        <th></th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for assessment in assessments %}
+      <tr>
+        <td>{{ assessment.title }}</td>
+        <td>{{ assessment.moduleCode }}</td>
+        <td>{{ assessment.deadline}}</td>
+        <td>{{ assessment.description }}</td>
+        <td>
+          {% if assessment.status %} Complete {% else %} Incomplete {% endif %}
+        </td>
+        <td>
+          <a
+            href="{{ url_for('Edit_assessment',assessment_id=assessment.id)}}"
+            class="btn btn-primary"
+            >Edit</a
+          >
+        </td>
+
+        <td>
+          <form
+            action="{{ url_for('delete_assessment', assessment_id=assessment.id) }}"
+            method="POST"
+            style="display: inline"
+          >
+            {{ form.csrf_token }}
+            <button
+              type="submit"
+              class="btn btn-danger"
+              onclick="return confirm('Are you sure you want to delete this assessment?');"
+            >
+              Delete
+            </button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

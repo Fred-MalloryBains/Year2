@@ -3,41 +3,14 @@
 class Rectangle
 {
 private:
-    double x;
-    double y;
-    double width;
-    double height;
+    double const x, y, width, height;
 
 public:
-    Rectangle(double x, double y, double width, double height)
-    {
-        this->x = x;
-        this->y = y;
-        this->width = width;
-        this->height = height;
-    }
-    Rectangle(double width, double height)
-    {
-        double x = 0;
-        double y = 0;
-        double width = width;
-        double hieght = height;
-    }
-
-    double get_x()
-    {
-        return x;
-    }
-    double get_y()
-    {
-        return y;
-    }
-    double get_width()
-    {
-        return width;
-    }
-    double get_height()
-    {
-        return height;
-    }
+    Rectangle(double, double, double, double);
+    double get_x() const { return x; }
+    double get_y() const { return y; }
+    double get_width() const { return width; }
+    double get_height() const { return height; }
+    double perimeter() const { return 2 * (width + height); }
+    double area() const { return width * height; }
 };

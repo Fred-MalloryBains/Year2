@@ -1,0 +1,14 @@
+{% extends "base.html" %} {% block content %}
+<div class="container">
+  <h1>Edit Assessment</h1>
+  <form action="" method="post" name="editAssessment">
+    {{ form.hidden_tag() }}
+    <p>Assessment Title: {{ form.assessment_title }}<br /></p>
+    <p>Module Code: {{ form.module_code }}<br /></p>
+    <p>Deadline Date: {{ form.deadline_date }}<br /></p>
+    <p>Short Description: {{ form.short_description }}<br /></p>
+    <p>Completion Status: {{ form.completion_status }}<br /></p>
+    <p><input type="submit" value="Update" /></p>
+  </form>
+</div>
+{% endblock %}
