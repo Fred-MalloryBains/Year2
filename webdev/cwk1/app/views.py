@@ -5,7 +5,10 @@ from .forms import AssessmentForm
 
 @app.route('/')
 def home():
-    return render_template('home.html', title="Home")
+    limit = request.args.get('limit',5,type = int) 
+    assessments = Assessments.query.limit(limit).all()
+    total_assessments = Assessments.query.count() #total rows
+    return render_template('home.html', assessments=assessments, total_assessments= total_assessments, limit = limit)
 
 @app.route('/create_assessment', methods=['GET', 'POST'])
 def create_assessment():
@@ -27,10 +30,19 @@ def create_assessment():
 @app.route('/view')
 def view():
     show_completed = request.args.get('show_completed') == 'true'
+    group = request.args.get('group')
+    deadline_order = request.args.get('deadline_date')
+    query = Assessments.query
+    
     if show_completed:
-        assessments = Assessments.query.filter(Assessments.status == True).all()
-    else:
-        assessments = Assessments.query.all()
+        query = query.filter(Assessments.status == True)
+    
+    if group:
+        query = query.order_by(Assessments.moduleCode)
+    elif deadline_order:
+        query = query.order_by(Assessments.deadline)
+    
+    assessments = query
     form = AssessmentForm()
     return render_template('view.html', form = form,assessments=assessments)
 
@@ -51,11 +63,12 @@ def Edit_assessment(assessment_id):
         assessment.deadline = form.deadline_date.data
         assessment.description = form.short_description.data
         print (form.completion_status.data == "Complete")
-        assessment.completion_status = (form.completion_status.data == 'Complete')
+        assessment.status = (form.completion_status.data == 'Complete')
+        
         db.session.commit()
         flash('Assessment updated successfully!')
-        
         return redirect(url_for('view'))
+    
     return render_template('edit.html', form=form,)
 
 @app.route('/delete_assessment/<int:assessment_id>', methods=['POST'])
@@ -68,3 +81,10 @@ def delete_assessment(assessment_id):
     
     flash('Assessment deleted successfully!')
     return redirect(url_for('view'))
+
+@app.route('/view_assessment/<int:assessment_id>', methods=['GET'])
+def view_assessment(assessment_id):
+    assessment = Assessments.query.get_or_404(assessment_id)
+    form = AssessmentForm(obj=assessment)
+    return render_template('view_assessment.html', form=form, assessment=assessment)
+    

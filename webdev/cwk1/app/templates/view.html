@@ -8,8 +8,16 @@
         request.args.get('show_completed') == 'true' %} checked {% endif %}>
         completed assessments
       </label>
+      <input type="checkbox" name="group" value="true" {% if
+        request.args.get('group') == 'true' %} checked {% endif %}>
+        group by module
+      </label>
+      <input type="checkbox" name="deadline_order" value="true" {% if
+        request.args.get('deadline_order') == 'true' %} checked {% endif %}>
+        order by deadline date
+      </label>
+      <button type="submit" class="btn btn-primary">reload</button>
     </div>
-    <button type="submit" class="btn btn-primary">Apply Filter</button>
   </form>
   <table class="table table-striped">
     <thead>
