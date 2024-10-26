@@ -30,18 +30,15 @@ def create_assessment():
 @app.route('/view')
 def view():
     show_completed = request.args.get('show_completed') == 'true'
-    group = request.args.get('group')
-    deadline_order = request.args.get('deadline_date')
+    show_uncompleted = request.args.get('show_uncompleted') == 'true'
     query = Assessments.query
     
     if show_completed:
         query = query.filter(Assessments.status == True)
-    
-    if group:
-        query = query.order_by(Assessments.moduleCode)
-    elif deadline_order:
-        query = query.order_by(Assessments.deadline)
-    
+        if show_uncompleted:
+            query = Assessments.query.filter(False).all()
+    elif show_uncompleted:
+        query = query.filter(Assessments.status == False)
     assessments = query
     form = AssessmentForm()
     return render_template('view.html', form = form,assessments=assessments)

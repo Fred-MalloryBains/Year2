@@ -3,7 +3,7 @@ body {
 }
 
 .container {
-    background-color: white; /* White background for the container */
+    background-color: rgb(241, 241, 238); /* White background for the container */
     padding: 20px;
     border-radius: 10px;
     margin-top: 50px;
@@ -15,3 +15,9 @@ body {
     border-radius: 10px;
     margin-top: 50px;
 }
+
+.card-body {
+    background-color: #deede2; 
+    border: 1px solid #b4ecc1;
+}
+

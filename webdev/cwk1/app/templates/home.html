@@ -1,13 +1,21 @@
 {% extends "base.html" %} {% block content %}
 <div class="container">
-  <h1>Assessments</h1>
+  <h1 class="text-center">Assessment Tracker</h1>
+  <p class="text-center">
+    Welcome to the assessment tracker Here you can preview your assessments and
+    their details.<br />
+    To view in more depth press view more and to see a table view you can use
+    the homepage
+    <br />
+    <br />
+  </p>
   <div class="row">
     {% for assessment in assessments %}
     <!--cards created using flask documentation  -->
     <div class="col-md-4">
       <div class="card mb-4">
         <div class="card-body">
-          <h5 class="card-title">{{ assessment.title }}</h5>
+          <h5 class="card-title text-center">{{ assessment.title }}</h5>
           <p class="card-text">
             <strong>Module Code:</strong> {{ assessment.moduleCode }}
           </p>
@@ -16,7 +24,7 @@
           </p>
           <a
             href="{{ url_for('view_assessment', assessment_id=assessment.id) }}"
-            class="btn btn-primary"
+            class="btn btn-info"
             >View More</a
           >
         </div>
@@ -30,7 +38,7 @@
           class="card-body d-flex flex-column justify-content-center align-items-center"
         >
           <h5 class="card-title">Create New Assessment</h5>
-          <a href="{{ url_for('create_assessment') }}" class="btn btn-primary"
+          <a href="{{ url_for('create_assessment') }}" class="btn btn-info"
             >Create</a
           >
         </div>
