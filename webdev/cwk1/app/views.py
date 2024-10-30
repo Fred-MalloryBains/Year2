@@ -14,7 +14,6 @@ def home():
 def create_assessment():
     form = AssessmentForm()
     if form.validate_on_submit():
-        flash('Success!')
         new_assessment = Assessments(
             title=form.assessment_title.data,
             moduleCode=form.module_code.data,
@@ -25,6 +24,9 @@ def create_assessment():
         db.session.add(new_assessment)
         db.session.commit()
         return redirect(url_for('view'))
+    else:
+        flash ('data entered is invalid, please try again')
+        
     return render_template('create.html', form=form)
 
 @app.route('/view')
@@ -43,8 +45,8 @@ def view():
     form = AssessmentForm()
     return render_template('view.html', form = form,assessments=assessments)
 
-@app.route('/Edit_assessment<int:assessment_id>', methods=['GET', 'POST'])
-def Edit_assessment(assessment_id):
+@app.route('/edit_assessment<int:assessment_id>', methods=['GET', 'POST'])
+def edit_assessment(assessment_id):
     assessment = Assessments.query.get(assessment_id)
     form = AssessmentForm(object = assessment)
     if request.method == 'GET':
