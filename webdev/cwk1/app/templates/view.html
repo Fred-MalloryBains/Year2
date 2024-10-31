@@ -4,6 +4,7 @@
   <h1>Assessments</h1>
   <form action="{{ url_for('view') }}" method="GET">
     <div class="form-group">
+      <!-- create checboxes to filter  -->
       <label>
         <input type="checkbox" name="show_completed" value="true" {% if
         request.args.get('show_completed') == 'true' %} checked {% endif %}>
@@ -14,9 +15,11 @@
         request.args.get('show_uncompleted') == 'true' %} checked {% endif %}>
         incomplete assessments
       </label>
-      <button type="submit" class="btn btn-info">reload</button>
+      <!-- Refresh -->
+      <button type="submit" class="btn btn-info">Refresh</button>
     </div>
   </form>
+  <!-- Bootstrap table definition -->
   <table class="table table-striped">
     <thead>
       <thead class="thread-dark">
@@ -32,6 +35,8 @@
       </thead>
     </thead>
     <tbody>
+      <!-- loop through assessments and add them to table -->
+      <!-- Potential to add pagination to prevent overflow-->
       {% if not assessments %}
       <tr>
         <td colspan="7" , class="text-center">No assessments found</td>
@@ -47,7 +52,7 @@
         </td>
         <td>
           <a
-            href="{{ url_for('Edit_assessment',assessment_id=assessment.id)}}"
+            href="{{ url_for('edit_assessment',assessment_id=assessment.id)}}"
             class="btn btn-outline-primary"
             >Edit</a
           >

@@ -4,6 +4,7 @@
   <form method="POST" action="">
     {{ form.hidden_tag() }}
 
+    <!-- Copy and pasted code but without the form -->
     <div class="form-group">
       <label for="assessment_title">Title</label>
       {{ form.assessment_title(class="form-control", readonly=True) }}
@@ -29,9 +30,9 @@
       <label for="completion_status">Completion Status</label>
       {{ form.completion_status(class="form-control", readonly=True) }}
     </div>
-
+    <!-- Edit selected assessment -->
     <a
-      href="{{ url_for('Edit_assessment', assessment_id=assessment.id) }}"
+      href="{{ url_for('edit_assessment', assessment_id=assessment.id) }}"
       class="btn btn-primary"
       >Edit</a
     >
