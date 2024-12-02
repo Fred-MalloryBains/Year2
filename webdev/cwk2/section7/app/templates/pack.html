@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+{%extends "base.html"%}
+
+{% block scripts %}
+  
+{% endblock %}
+
+	
+
+	
+
+
+{%block content %}
+<html lang="en">
+  <head>
+    <title>Click to open pack!</title>
+</head>
+  </head>
+  <body>
+    <div class="big-card">
+      <div class="card-body">
+        <h5 class="card-title">{{ pack.name }}</h5>
+        <a id="open-pack-btn" class="btn btn-primary" data-pack-id="{{ pack.id }}">
+          Open Pack
+        </a>
+      </div>
+    </div>
+    <div id = "pack-results" class="Container">
+      <!-- opened cards here -->
+    </div>
+  </body>
+</html>
+{%endblock%}

@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+{% extends "base.html" %} {% block content %}
+
+<h1 class="title">My cards</h1>
+
+<div class="Container">
+  <div class="card-group" style="display: flex; flex-wrap: wrap">
+    {% for artist in artists %}
+    <div class="{{artist.rarity_class}}" style="flex: 1 0 21%; margin: 10px">
+      <div class="card-body">
+        <h5 class="card-title">{{ artist.name }}</h5>
+        <img src="{{artist.image_url}}" class="card-img" />
+        <p class="card-text">Rarity: {{ artist.rarity }}</p>
+        <p class="card-text">Genre: {{ artist.genre }}</p>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+{%endblock%}
