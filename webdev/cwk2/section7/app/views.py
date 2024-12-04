@@ -24,6 +24,7 @@ SPOTIFY_CLIENT_ID = os.getenv('SPOTIFY_CLIENT_ID')
 SPOTIFY_CLIENT_SECRET = os.getenv('SPOTIFY_CLIENT_SECRET')
 SPOTIFY_REDIRECT_URI = os.getenv('SPOTIFY_REDIRECT_URI')
 scope = os.getenv('SPOTIFY_SCOPE')
+app.secret_key = os.getenv('SECRET_KEY')
 
 
 cache_handler = FlaskSessionCacheHandler(session)
@@ -52,18 +53,20 @@ def index():
     ## login page 
     ## register page
     
-    
     return render_template('home.html')
 
 @app.route('/login', methods = ['GET', 'POST'])
 def login():
     form = LoginForm()
-    if form.validate_on_submit():
-        user = Users.query.filter_by(username=form.username.data).first()
-        if user is None or user.password != form.password.data:
-            flash('Invalid username or password')
-            return redirect(url_for('login'))
-        return redirect(url_for('dashboard'))
+    if request.method == 'POST':
+        if form.validate_on_submit():
+            user = Users.query.filter_by(username=form.username.data).first()
+            if user is None or user.password != form.password.data:
+                flash('Invalid username or password')
+                return redirect(url_for('login'))
+            session['userId'] = user.id
+            print ("session id added , ", session['userId'])
+            return redirect(url_for('dashboard'))
     return render_template('login.html', form=form)
 
 @app.route('/register', methods = ['GET', 'POST'])
@@ -102,7 +105,46 @@ def callback():
     session['token_info'] = token_info
     return redirect(url_for('dashboard'))
 
+@app.route('/logout')
+def logout ():
+    session.clear()
+    return redirect(url_for('index'))
 
+@app.route('/add_pack', methods = ['POST', 'GET'])
+def add_pack():
+    print (session['userId'] )
+    data = request.get_json()
+    packId = data['packId']
+    packCredits = Pack.query.filter_by(id = packId).first().cost
+    userCredits = Users.query.filter_by(id = session['userId']).first().credits
+    if userCredits >= packCredits:
+        if (UserPacks.query.filter_by(user_id = session['userId'], packId = packId).first()):
+            user_pack = UserPacks.query.filter_by(user_id = session['userId'], packId = packId).first()
+            user_pack.quantity += 1
+            Users.query.filter_by(id = session['userId']).first().credits -= packCredits
+        else:
+            user_pack = UserPacks(
+                user_id = session['userId'],
+                packId = packId,
+                quantity = 1
+            )
+            db.session.add(user_pack)
+        db.session.commit()
+    else:
+        flash ('Not enough credits')
+        return redirect(url_for('dashboard'))
+    packs = UserPacks.query.filter_by(user_id = session['userId']).all()
+    user_packs = []
+    for pack in packs:
+        Id = pack.packId
+        info = Pack.query.filter_by(id = Id).first()
+        pack = {
+            'name' : info.genre + ' ' + info.rarity + ' pack',
+            'quantity' : pack.quantity,
+            'id' : Id
+        }
+        user_packs.append(pack)
+    return json.dumps(user_packs)
 
 
 @app.route('/dashboard')
@@ -119,7 +161,9 @@ def dashboard():
             'price' : packs.cost,
             'Id' : packs.id
         }
+        
         store_packs.append(pack_info)
+    
     return render_template('dashboard.html', store_packs = store_packs)
 
 
@@ -128,8 +172,26 @@ def profile():
     
     ## profile page
     ## show cards 
-    
-    return render_template('profile.html')
+    if session['userId']:
+        
+        spotify_linked = True
+        token_info = session.get('token_info', None)
+        if not token_info:
+            spotify_linked = False
+        userpacks = len(UserPacks.query.filter_by(user_id = session['userId']).all())
+        userCards = len(UserCards.query.filter_by(user_id = session['userId']).all())
+        user = Users.query.filter_by(id = session['userId']).first()
+        user_info = {
+            'username' : user.username,
+            'email' : user.email,
+            'credits' : user.credits,
+            'no_of_packs' : userpacks,
+            'no_of_cards' : userCards,
+            'spotify_linked' : spotify_linked
+        }
+        return render_template('profile.html', user = user_info)
+    else:
+        return render_template('home.html')
 
 def get_rarity(popularity):
     if popularity > 90:
@@ -147,40 +209,90 @@ def my_cards():
     ## show cards 
     token_info = session.get('token_info', None)
     if not token_info:
+        flash ('please log into spotify to view card library!')
         return redirect(url_for('link_spotify'))
     if sp_oauth.is_token_expired(token_info):
         token_info = sp_oauth.refresh_access_token(token_info['refresh_token'])
         session['token_info'] = token_info
-
-    sp = spotipy.Spotify(auth=token_info['access_token'])
-    artist_list = []
-    artists = sp.current_user_followed_artists(limit=20)
-    ## keep querying until we have 100 artists or run out of artists
-    ## add filters for rarity/ collected
-    while artists['artists']['next'] and len(artist_list) < 100:
-        artists = sp.current_user_followed_artists(limit=20, after=artists['artists']['cursors']['after'])
-        for artist in artists['artists']['items']:
-            rarity = get_rarity(artist['popularity'])
-            artist_info = {
-                'name': artist['name'],
-                'rarity': rarity,
-                'rarity_class' : rarity + '-card',
-                'image_url': artist['images'][0]['url'] if artist['images'] else None,
-                'genre': artist['genres'][0] if artist['genres'] else None,
-            }
-            artist_list.append(artist_info)
-            if len(artist_list) >= 100:
-                break
         
     # create artist list and pass into html to display cards 
     # also check db for cards
     ## create db 
-    return render_template('my_cards.html', artists = artist_list)
+    return render_template('my_cards.html')
+
+@app.route('/my_cards_query', methods = ['POST'])
+def my_cards_query():
+    data = request.get_json()
+    user_cards = []
+    print (data)
+    if data['isCollected']:
+        user_cards = []
+        artists = UserCards.query.filter_by(user_id = session['userId']).all()
+        for artist in artists:
+            card = Cards.query.filter_by(id = artist.card_id).first()
+            if card.rarity == data['rarity'] or data['rarity'] == 'all':
+                card_info = {
+                    'name': card.artist_name,
+                    'rarity': card.rarity,
+                    'rarity_class' : card.rarity + '-card',
+                    'image_url': card.image_url,
+                    'genre': card.genre,
+                }
+                user_cards.append(card_info)  
+              
+    else:
+        print ("hello")
+        token_info = session.get('token_info', None)
+        if not token_info:
+            return redirect(url_for('link_spotify'))
+        if sp_oauth.is_token_expired(token_info):
+            token_info = sp_oauth.refresh_access_token(token_info['refresh_token'])
+            session['token_info'] = token_info
+
+        sp = spotipy.Spotify(auth=token_info['access_token'])
+        artist_list = []
+        artists = sp.current_user_followed_artists(limit=20)
+        ## keep querying until we have 100 artists or run out of artists
+        ## add filters for rarity/ collected
+        while artists['artists']['next'] and len(artist_list) < 100:
+            artists = sp.current_user_followed_artists(limit=20, after=artists['artists']['cursors']['after'])
+            for artist in artists['artists']['items']:
+                rarity = get_rarity(artist['popularity'])
+                artist_info = {
+                    'name': artist['name'],
+                    'rarity': rarity,
+                    'rarity_class' : rarity + '-card',
+                    'image_url': artist['images'][0]['url'] if artist['images'] else None,
+                    'genre': artist['genres'][0] if artist['genres'] else None,
+                }
+                artist_list.append(artist_info)
+                if len(artist_list) >= 100:
+                    break
+        for artist in artist_list:
+            if artist['rarity'] == data['rarity'] or data['rarity'] == 'all':
+                user_cards.append(artist)
+                
+    return json.dumps(user_cards)
+
+@app.route('/open_my_packs')
+def open_my_packs():
+    packs = UserPacks.query.filter_by(user_id = session['userId']).all()
+    user_packs = []
+    for pack in packs:
+        Id = pack.packId
+        info = Pack.query.filter_by(id = Id).first()
+        pack = {
+            'name' : info.genre + ' ' + info.rarity + ' pack',
+            'quantity' : pack.quantity,
+            'id' : Id
+        }
+        user_packs.append(pack)
+    return render_template('open_my_packs.html', user_packs = user_packs)
 
 @app.route('/open-pack/', methods=['GET','POST'])
 def open_pack():
     packId = request.args.get('packId')
-    
+    print (packId)
     pack_info = Pack.query.filter_by(id = packId).first()
     pack_info = {
         'name' : pack_info.genre + ' ' + pack_info.rarity + ' pack',
@@ -221,9 +333,18 @@ def open_pack_response():
             'genre': card.genre,
         }
         packed_cards.append(card)
-        if UserCards.query.filter_by(user_id = 1, card_id = card.id).first():
-            user_card = UserCards.query.filter_by(user_id = 1, card_id = card.id).first()
+        card_item = Cards.query.filter_by(artist_name = card['name']).first()
+        if UserCards.query.filter_by(user_id = session['userId'], card_id = card_item.id).first():
+            user_card = UserCards.query.filter_by(user_id = 1, card_id = card_item.id).first()
             user_card.quantity += 1
-            db.session.commit()
+            
+        else:
+            user_card = UserCards(
+                user_id = session['userId'],
+                card_id = card_item.id,
+                quantity = 1
+            )
+            db.session.add(user_card)
+        db.session.commit()
     ## END SOME CODE
     return json.dumps(packed_cards)

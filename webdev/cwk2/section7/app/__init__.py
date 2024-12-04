@@ -14,6 +14,8 @@ def get_locale():
 
 app = Flask(__name__)
 app.config.from_object('config')
+
+
 db = SQLAlchemy(app)
 
 #login_manager = LoginManager() 

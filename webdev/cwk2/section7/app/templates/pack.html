@@ -1,21 +1,11 @@
 <!DOCTYPE html>
 {%extends "base.html"%}
 
-{% block scripts %}
-  
-{% endblock %}
-
-	
-
-	
-
-
 {%block content %}
 <html lang="en">
   <head>
     <title>Click to open pack!</title>
 </head>
-  </head>
   <body>
     <div class="big-card">
       <div class="card-body">
@@ -29,5 +19,11 @@
       <!-- opened cards here -->
     </div>
   </body>
+  <class = "Container">
+    <div class="text-center">
+      <a href="{{ url_for('dashboard') }}" class="btn btn-outline-secondary">
+        Back to dashboard
+      </a>
+    </div>
 </html>
 {%endblock%}

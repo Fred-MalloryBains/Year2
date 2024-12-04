@@ -2,19 +2,38 @@
 {% extends "base.html" %} {% block content %}
 
 <h1 class="title">My cards</h1>
-
 <div class="Container">
-  <div class="card-group" style="display: flex; flex-wrap: wrap">
-    {% for artist in artists %}
-    <div class="{{artist.rarity_class}}" style="flex: 1 0 21%; margin: 10px">
-      <div class="card-body">
-        <h5 class="card-title">{{ artist.name }}</h5>
-        <img src="{{artist.image_url}}" class="card-img" />
-        <p class="card-text">Rarity: {{ artist.rarity }}</p>
-        <p class="card-text">Genre: {{ artist.genre }}</p>
-      </div>
-    </div>
-    {% endfor %}
+  <div class="text-center">
+    <label class="form-check-label">
+      <input
+        id="isCollected"
+        type="checkbox"
+        class="form-check-input"
+        checked
+      />
+      Collected
+    </label>
+    <select
+      id="rarity-search"
+      class="form-select form-select-lg mb-3"
+      aria-label="Select rarity"
+    >
+      <option selected>Select rarity</option>
+      <option value="1">Common</option>
+      <option value="2">Rare</option>
+      <option value="3">Epic</option>
+      <option value="4">Legendary</option>
+      <option value="5">All</option>
+    </select>
+  </div>
+</div>
+<div class="Container">
+  <div
+    id="query-results"
+    class="card-group"
+    style="display: flex; flex-wrap: wrap"
+  >
+    <!-- cards here -->
   </div>
 </div>
 

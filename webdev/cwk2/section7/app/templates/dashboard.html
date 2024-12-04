@@ -21,25 +21,32 @@
 <div class="Container">
   <div class="text-center">
     <p class="body">store</p>
-    {%for pack in store_packs%}
-    <div class="store-cards" style="flex: 1 0 21%; margin: 10px">
+
+    <div class="store-cards">
+      {%for pack in store_packs%}
       <div class="card-body">
         <h5 class="card-title">{{ pack.name }}</h5>
         <p class="card-text">Cost: {{ pack.price }}</p>
 
-        <a
-          href="{{ url_for('open_pack', packId = pack.Id) }}"
-          class="btn btn-primary"
+        <a class="btn btn-primary buy-pack-btn" data-pack-id="{{ pack.Id }}"
           >Buy</a
         >
       </div>
+
+      {% endfor %}
     </div>
-    {% endfor %}
   </div>
 </div>
 <div class="Container">
   <div class="text-center">
     <p class="body">my packs</p>
+    <p id="my_packs" class="store-cards"></p>
+    <!-- user packs loaded here -->
+  </div>
+  <div class="text-center">
+    <a href="{{ url_for('open_my_packs') }}" class="btn btn-outline-secondary"
+      >open your packs here
+    </a>
   </div>
 </div>
 {% endblock %}

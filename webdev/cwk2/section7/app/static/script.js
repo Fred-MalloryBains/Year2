@@ -22,22 +22,41 @@ $(document).ready(function() {
             contentType: "application/json; charset=utf-8",
             dataType: "json",
             success: function(response) {
-            console.log(response);
-
+                $('.big-card').remove();
+                var gifElement = $('<img>', {
+                    id: 'loading-gif',
+                    src: '/static/images/explosion.gif', // Replace with your actual GIF path
+                    alt: 'Loading...',
+                });
+                
+                $('body').append(gifElement);
+            
+                // Show the GIF
+                function showGif() {
+                    $('#loading-gif').show();
+                }
+            
+                // Hide the GIF
+                function hideGif() {
+                    $('#loading-gif').hide();
+                }
+                showGif();
+                setTimeout(hideGif, 1500);
+                
             // Update the html rendered to reflect the opened pack items
-            var resultsContainer = $('#pack-results');
-            response.forEach(item => {
-                resultsContainer.append(`
-                <div class="${item.rarity_class}">
-                    <div class="card-body">
-                    <h5 class="card-title">${item.name}</h5>
-                    <img src="${item.image_url}" class="card-img" />
-                    <p class="card-text">Rarity: ${item.rarity}</p>
-                    <p class="card-text">Genre: ${item.genre}</p>
-                    </div>
-                </div>`
-                );
-            });
+                var resultsContainer = $('#pack-results');
+                response.forEach(item => {
+                    resultsContainer.append(`
+                    <div class="${item.rarity_class}">
+                        <div class="card-body-medium">
+                        <h5 class="card-title">${item.name}</h5>
+                        <img src="${item.image_url}" class="card-img" />
+                        <p class="card-text">Rarity: ${item.rarity}</p>
+                        <p class="card-text">Genre: ${item.genre}</p>
+                        </div>
+                    </div>`
+                    );
+                });
             },
             error: function(error) {
             console.log(error);
